@@ -7,6 +7,8 @@ import subprocess
 import logging
 from datetime import datetime
 from PIL import Image, ImageTk
+import os  
+
 
 # Configuration du fichier CSV
 input_file = 'comptes-protec.csv'
@@ -88,6 +90,7 @@ def modifier_mots_de_passe():
             with open(input_file, mode='w', newline='', encoding='utf-8') as outfile:
                 writer = csv.DictWriter(outfile, fieldnames=fieldnames, delimiter=';')
                 writer.writeheader()
+               
                 for row in rows:
                     row['PASSWORD'] = generate_password()
                     writer.writerow(row)
@@ -201,148 +204,239 @@ def rechercher_utilisateur(nom, prenom):
         messagebox.showerror("Erreur", f"Erreur lors de la recherche : {str(e)}")
         logging.error(f"Erreur lors de la recherche : {str(e)}")
 
-# Configuration de l'interface graphique
+def gerer_groupes_ad():
+    """Gère les groupes Active Directory."""
+    try:
+        # Exécuter le script PowerShell pour gérer les groupes AD
+        result = subprocess.run(["powershell", "-File", "C:\\powershell\\gerer_groupes_ad.ps1"], capture_output=True, text=True)
+       
+        if result.returncode == 0:
+            messagebox.showinfo("Succès", "Gestion des groupes AD réussie !")
+            logging.info("Gestion des groupes AD réussie.")
+        else:
+            messagebox.showerror("Erreur", f"Erreur lors de la gestion des groupes AD : {result.stderr}")
+            logging.error(f"Erreur lors de la gestion des groupes AD : {result.stderr}")
+    except Exception as e:
+        messagebox.showerror("Erreur", f"Exception lors de la gestion des groupes AD : {str(e)}")
+        logging.error(f"Exception lors de la gestion des groupes AD : {str(e)}")
+
+def gerer_permissions_ntfs():
+    """Gère les permissions NTFS."""
+    try:
+        # Exécuter le script PowerShell pour gérer les permissions NTFS
+        result = subprocess.run(["powershell", "-File", "C:\\powershell\\gerer_permissions_ntfs.ps1"], capture_output=True, text=True)
+       
+        if result.returncode == 0:
+            messagebox.showinfo("Succès", "Gestion des permissions NTFS réussie !")
+            logging.info("Gestion des permissions NTFS réussie.")
+        else:
+            messagebox.showerror("Erreur", f"Erreur lors de la gestion des permissions NTFS : {result.stderr}")
+            logging.error(f"Erreur lors de la gestion des permissions NTFS : {result.stderr}")
+    except Exception as e:
+        messagebox.showerror("Erreur", f"Exception lors de la gestion des permissions NTFS : {str(e)}")
+        logging.error(f"Exception lors de la gestion des permissions NTFS : {str(e)}")
+
+def exporter_rapport():
+    """Exporte un rapport des utilisateurs."""
+    file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV Files", "*.csv")])
+    if file_path:
+        try:
+            with open(input_file, mode='r', newline='', encoding='utf-8') as infile:
+                reader = csv.DictReader(infile, delimiter=';')
+                rows = list(reader)
+           
+            with open(file_path, mode='w', newline='', encoding='utf-8') as outfile:
+                writer = csv.DictWriter(outfile, fieldnames=reader.fieldnames, delimiter=';')
+                writer.writeheader()
+                writer.writerows(rows)
+           
+            messagebox.showinfo("Succès", "Rapport exporté avec succès.")
+            logging.info("Rapport exporté vers un fichier CSV.")
+        except Exception as e:
+            messagebox.showerror("Erreur", f"Erreur lors de l'exportation du rapport : {str(e)}")
+            logging.error(f"Erreur lors de l'exportation du rapport : {str(e)}")
+
+# Initialisation de la fenêtre principale
 root = tk.Tk()
 root.title("Gestion des Utilisateurs")
-root.geometry('800x600')
-root.resizable(False, False)
 
-# Charger l'image en arrière-plan
-background_image = Image.open('bg-main-dark-1440w.jpg')
-bg = ImageTk.PhotoImage(background_image)
+# Nouvelle dimension de la fenêtre
+window_width = 1024
+window_height = 768
 
-# Créer un label pour afficher l'image d'arrière-plan
-background_label = tk.Label(root, image=bg)
-background_label.place(relwidth=1, relheight=1)
+# Centrer la fenêtre sur l'écran
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x_coordinate = int((screen_width / 2) - (window_width / 2))
+y_coordinate = int((screen_height / 2) - (window_height / 2))
+root.geometry(f"{window_width}x{window_height}+{x_coordinate}+{y_coordinate}")
 
-# Conteneur pour les autres widgets
-container = tk.Frame(root, bg='#f6f8fa')
-container.place(relwidth=1, relheight=1)
+# Configuration du style neon extravagant
+style = ttk.Style(root)
+style.theme_use("clam")  # Utiliser le thème 'clam' pour permettre la personnalisation
 
-# Le reste de ton interface (onglets et boutons) va ici
-# Création du Notebook (onglets)
-notebook = ttk.Notebook(container)
-notebook.pack(expand=True, fill=tk.BOTH)
 
-# Onglet pour ajouter/supprimer des utilisateurs
-tab_ajouter_supprimer = ttk.Frame(notebook)
+# Palette naturelle et élégante
+neon_bg    = "#188080"  # Vert foncé terreux  
+neon_green = "#acccc8"  # Vert olive doux  
+neon_pink  = "#e2888c"  # Terre cuite subtile  
+neon_blue  = "#acccc8"  # Bleu-gris océanique  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Personnalisation des styles pour une apparence extravagante
+style.configure("TFrame", background=neon_bg)
+style.configure("TLabel", background=neon_bg, foreground=neon_green, font=("Helvetica", 12, "bold"))
+style.configure("TButton", background=neon_bg, foreground=neon_pink, font=("Helvetica", 11, "bold"))
+style.map("TButton",
+          background=[('active', neon_blue)],
+          foreground=[('active', neon_bg)])
+style.configure("TNotebook", background=neon_bg, borderwidth=0)
+style.configure("TNotebook.Tab", background=neon_bg, foreground=neon_green, padding=[10, 5], font=("Helvetica", 11, "bold"))
+style.map("TNotebook.Tab",
+          background=[("selected", neon_green)],
+          foreground=[("selected", neon_bg)])
+
+# Création d'un cadre principal avec du padding pour centrer le contenu
+main_frame = ttk.Frame(root, padding=20)
+main_frame.pack(expand=True, fill="both")
+
+# Création d'un Notebook pour organiser les onglets
+notebook = ttk.Notebook(main_frame)
+notebook.pack(expand=True, fill="both")
+
+# -------------------------- Onglet: Ajouter/Supprimer --------------------------
+tab_ajouter_supprimer = ttk.Frame(notebook, padding=10)
 notebook.add(tab_ajouter_supprimer, text="Ajouter/Supprimer")
 
-# Champs de saisie pour l'onglet Ajouter/Supprimer
+# Nom
 label_nom = ttk.Label(tab_ajouter_supprimer, text="Nom :")
 label_nom.grid(row=0, column=0, sticky="e", pady=10, padx=10)
 entry_nom = ttk.Entry(tab_ajouter_supprimer, width=30)
-entry_nom.grid(row=0, column=1, pady=10, padx=10, sticky="w")
+entry_nom.grid(row=0, column=1, sticky="w", pady=10, padx=10)
 
+# Prénom
 label_prenom = ttk.Label(tab_ajouter_supprimer, text="Prénom :")
 label_prenom.grid(row=1, column=0, sticky="e", pady=10, padx=10)
 entry_prenom = ttk.Entry(tab_ajouter_supprimer, width=30)
-entry_prenom.grid(row=1, column=1, pady=10, padx=10, sticky="w")
+entry_prenom.grid(row=1, column=1, sticky="w", pady=10, padx=10)
 
+# Service
 label_service = ttk.Label(tab_ajouter_supprimer, text="Service :")
 label_service.grid(row=2, column=0, sticky="e", pady=10, padx=10)
 services = [
-    "Collaborateurs", "Commercial", "Comptabilité", "ContrôleNonDestructif", "DéveloppementDeSolutions", "Galva",
-    "HygièneSécuritéEnvironnement", "Informatique", "MéthodesDeProduction", "Peinture", "Qualité",
-    "RevueDeContrat", "R&D", "RessourcesHumaines", "Stagiaire", "TraitementDesMatériaux", "TraitementDeSurface",
-    "WSI"
+    "Collaborateurs", "Commercial", "Comptabilité", "ContrôleNonDestructif",
+    "DéveloppementDeSolutions", "Galva", "HygièneSécuritéEnvironnement",
+    "Informatique", "MéthodesDeProduction", "Peinture", "Qualité",
+    "RevueDeContrat", "R&D", "RessourcesHumaines", "Stagiaire",
+    "TraitementDesMatériaux", "TraitementDeSurface", "WSI"
 ]
 service_var = tk.StringVar()
 dropdown_service = ttk.Combobox(tab_ajouter_supprimer, textvariable=service_var, values=services, state='readonly', width=28)
-dropdown_service.grid(row=2, column=1, pady=10, padx=10, sticky="w")
+dropdown_service.grid(row=2, column=1, sticky="w", pady=10, padx=10)
 
-# Boutons pour ajouter/supprimer
-btn_ajouter = ttk.Button(tab_ajouter_supprimer, text="Ajouter", command=lambda: add_user(entry_nom.get(), entry_prenom.get(), service_var.get()))
-btn_ajouter.grid(row=3, column=0, padx=10, pady=5)
+# Boutons Ajouter et Supprimer
+btn_ajouter = ttk.Button(tab_ajouter_supprimer, text="Ajouter",
+                         command=lambda: add_user(entry_nom.get(), entry_prenom.get(), service_var.get()))
+btn_ajouter.grid(row=3, column=0, pady=5, padx=10)
 
-btn_supprimer = ttk.Button(tab_ajouter_supprimer, text="Supprimer", command=lambda: delete_user(entry_nom.get(), entry_prenom.get()))
-btn_supprimer.grid(row=3, column=1, padx=10, pady=5)
+btn_supprimer = ttk.Button(tab_ajouter_supprimer, text="Supprimer",
+                           command=lambda: delete_user(entry_nom.get(), entry_prenom.get()))
+btn_supprimer.grid(row=3, column=1, pady=5, padx=10)
 
-# Onglet pour modifier les mots de passe
-tab_modifier_mdp = ttk.Frame(notebook)
+# -------------------------- Onglet: Modifier Mots de Passe --------------------------
+tab_modifier_mdp = ttk.Frame(notebook, padding=10)
 notebook.add(tab_modifier_mdp, text="Modifier Mots de Passe")
 
-# Champs de saisie pour modifier le mot de passe d'un utilisateur spécifique
+# Nom pour modification de mot de passe
 label_nom_mdp = ttk.Label(tab_modifier_mdp, text="Nom :")
 label_nom_mdp.grid(row=0, column=0, sticky="e", pady=10, padx=10)
 entry_nom_mdp = ttk.Entry(tab_modifier_mdp, width=30)
-entry_nom_mdp.grid(row=0, column=1, pady=10, padx=10, sticky="w")
+entry_nom_mdp.grid(row=0, column=1, sticky="w", pady=10, padx=10)
 
-
+# Prénom pour modification de mot de passe
 label_prenom_mdp = ttk.Label(tab_modifier_mdp, text="Prénom :")
 label_prenom_mdp.grid(row=1, column=0, sticky="e", pady=10, padx=10)
 entry_prenom_mdp = ttk.Entry(tab_modifier_mdp, width=30)
-entry_prenom_mdp.grid(row=1, column=1, pady=10, padx=10, sticky="w")
+entry_prenom_mdp.grid(row=1, column=1, sticky="w", pady=10, padx=10)
 
-# Boutons pour modifier les mots de passe
-btn_modifier_mdp_user = ttk.Button(tab_modifier_mdp, text="Modifier Mot de Passe", command=lambda: modifier_mot_de_passe_user(entry_nom_mdp.get(), entry_prenom_mdp.get()))
+# Bouton Modifier mot de passe pour un utilisateur spécifique
+btn_modifier_mdp_user = ttk.Button(tab_modifier_mdp, text="Modifier Mot de Passe",
+                                   command=lambda: modifier_mot_de_passe_user(entry_nom_mdp.get(), entry_prenom_mdp.get()))
 btn_modifier_mdp_user.grid(row=2, column=0, columnspan=2, pady=20)
 
+# Bouton Modifier tous les mots de passe
 btn_modifier_mdp_all = ttk.Button(tab_modifier_mdp, text="Modifier Tous les Mots de Passe", command=modifier_mots_de_passe)
 btn_modifier_mdp_all.grid(row=3, column=0, columnspan=2, pady=20)
 
-# Onglet pour synchroniser avec AD
-tab_synchroniser = ttk.Frame(notebook)
+# -------------------------- Onglet: Synchroniser avec AD --------------------------
+tab_synchroniser = ttk.Frame(notebook, padding=10)
 notebook.add(tab_synchroniser, text="Synchroniser avec AD")
 
-# Bouton pour synchroniser avec AD
 btn_synchroniser = ttk.Button(tab_synchroniser, text="Synchroniser avec AD", command=synchroniser_ad)
 btn_synchroniser.pack(pady=20)
 
-# Onglet pour importer/exporter des utilisateurs
-tab_importer_exporter = ttk.Frame(notebook)
+# -------------------------- Onglet: Importer/Exporter --------------------------
+tab_importer_exporter = ttk.Frame(notebook, padding=10)
 notebook.add(tab_importer_exporter, text="Importer/Exporter")
 
-# Boutons pour importer/exporter
 btn_importer = ttk.Button(tab_importer_exporter, text="Importer Utilisateurs", command=importer_utilisateurs)
 btn_importer.pack(pady=10)
 
 btn_exporter = ttk.Button(tab_importer_exporter, text="Exporter Utilisateurs", command=exporter_utilisateurs)
 btn_exporter.pack(pady=10)
 
-# Onglet pour rechercher des utilisateurs
-tab_rechercher = ttk.Frame(notebook)
+# -------------------------- Onglet: Rechercher Utilisateur --------------------------
+tab_rechercher = ttk.Frame(notebook, padding=10)
 notebook.add(tab_rechercher, text="Rechercher Utilisateur")
 
-# Champs de saisie pour rechercher un utilisateur
 label_nom_recherche = ttk.Label(tab_rechercher, text="Nom :")
 label_nom_recherche.grid(row=0, column=0, sticky="e", pady=10, padx=10)
 entry_nom_recherche = ttk.Entry(tab_rechercher, width=30)
-entry_nom_recherche.grid(row=0, column=1, pady=10, padx=10, sticky="w")
+entry_nom_recherche.grid(row=0, column=1, sticky="w", pady=10, padx=10)
 
 label_prenom_recherche = ttk.Label(tab_rechercher, text="Prénom :")
 label_prenom_recherche.grid(row=1, column=0, sticky="e", pady=10, padx=10)
 entry_prenom_recherche = ttk.Entry(tab_rechercher, width=30)
-entry_prenom_recherche.grid(row=1, column=1, pady=10, padx=10, sticky="w")
+entry_prenom_recherche.grid(row=1, column=1, sticky="w", pady=10, padx=10)
 
-# Bouton pour rechercher un utilisateur
-btn_rechercher = ttk.Button(tab_rechercher, text="Rechercher", command=lambda: rechercher_utilisateur(entry_nom_recherche.get(), entry_prenom_recherche.get()))
+btn_rechercher = ttk.Button(tab_rechercher, text="Rechercher",
+                            command=lambda: rechercher_utilisateur(entry_nom_recherche.get(), entry_prenom_recherche.get()))
 btn_rechercher.grid(row=2, column=0, columnspan=2, pady=20)
 
-# Onglet pour gérer les groupes AD
-tab_groupes_ad = ttk.Frame(notebook)
+# -------------------------- Onglet: Gérer Groupes AD --------------------------
+tab_groupes_ad = ttk.Frame(notebook, padding=10)
 notebook.add(tab_groupes_ad, text="Gérer Groupes AD")
 
-# Bouton pour gérer les groupes AD
 btn_gerer_groupes_ad = ttk.Button(tab_groupes_ad, text="Gérer Groupes AD", command=gerer_groupes_ad)
 btn_gerer_groupes_ad.pack(pady=20)
 
-# Onglet pour gérer les permissions NTFS
-tab_permissions_ntfs = ttk.Frame(notebook)
+# -------------------------- Onglet: Gérer Permissions NTFS --------------------------
+tab_permissions_ntfs = ttk.Frame(notebook, padding=10)
 notebook.add(tab_permissions_ntfs, text="Gérer Permissions NTFS")
 
-# Bouton pour gérer les permissions NTFS
 btn_gerer_permissions_ntfs = ttk.Button(tab_permissions_ntfs, text="Gérer Permissions NTFS", command=gerer_permissions_ntfs)
 btn_gerer_permissions_ntfs.pack(pady=20)
 
-# Onglet pour exporter des rapports
-tab_rapports = ttk.Frame(notebook)
+# -------------------------- Onglet: Exporter Rapports --------------------------
+tab_rapports = ttk.Frame(notebook, padding=10)
 notebook.add(tab_rapports, text="Exporter Rapports")
 
-# Bouton pour exporter un rapport
 btn_exporter_rapport = ttk.Button(tab_rapports, text="Exporter Rapport", command=exporter_rapport)
 btn_exporter_rapport.pack(pady=20)
 
-# Lancer l'interface
+# Lancement de l'interface
 root.mainloop()
-
