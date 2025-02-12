@@ -1,13 +1,9 @@
 NOM;PRENOM;IDENTIFIANT;PASSWORD;service;MESSAGERIE;ExpirationDate;ChangePassword;Script
-AURAT;Tanguy;tanguy.aurat;ProtecVOgs2cf#;ControleQualite;t.aurat@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
+
 BAMEY;Axel;axel.bamey;Protec2qrPoqn$;ControleQualite;a.bamey@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
 DEBEY;Antony;antony.debey;Protec3uE9SRO];ControleQualite;a.debey@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
 ETIENNEY;Timothe;timothe.etienney;Protec3FF2RpP<;ControleQualite;t.etienney@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
 FRULEUX;Alexandre;alexandre.fruleux;ProtecK6TqCD4|;ControleQualite;a.fruleux@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
-HUBART;Guillaume;guillaume.hubart;ProtecKW1mTf3(;ControleQualite;g.hubart@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
-IFKIRNE;Khadija;khadija.ifkirne;ProtecaHWJDKO);ControleQualite;k.ifkirne@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
-LAROUBINE;Gwendall;gwendall.laroubine;ProtecsUyppFW`;ControleQualite;g.laroubine@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
-MARJANOVIC;Marco;marco.marjanovic;ProtecJUSpdVH];ControleQualite;m.marjanovic@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
 MORET;Camille;camille.moret;Protec9iRUNRN';ControleQualite;c.moret@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
 PENOT;Cedric;cedric.penot;ProtecxeiS83B~;ControleQualite;c.penot@protec-groupe.com;02/07/2030;NON;ControleQualite.bat
 REIZER;Michel;michel.reizer;ProtecLjHCh7Z`;ControleQualite;m.reizer@protec-groupe.com;02/07/2030;NON;ControleQualite.bat

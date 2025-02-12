@@ -1,8 +1,35 @@
-2025-02-10 13:20:11,909 - INFO - Aucun utilisateur trouvé.
-2025-02-10 13:20:18,474 - INFO - Aucun utilisateur trouvé.
-2025-02-10 13:22:10,677 - INFO - Utilisateurs exportés vers un fichier CSV.
-2025-02-10 13:23:23,998 - INFO - Aucun utilisateur trouvé.
-2025-02-10 13:23:29,330 - ERROR - Erreur lors de la gestion des groupes AD : L'argument ®ÿC:\powershell\gerer_groupes_ad.ps1ÿ¯ du paramŠtre -File n'existe pas. Indiquez le chemin d'accŠs vers un fichier ®ÿ.ps1ÿ¯ existant pour l'argument du paramŠtre -File.
+2025-02-11 16:28:06,796 - ERROR - Erreur lors de la synchronisation : Impossible de charger le fichier C:\powershell\synchroniser_ad.ps1. Le fichier C:\powershell\synchroniser_ad.ps1 n'est pas sign‚ num‚riquement. Vous ne pouvez pas 
+ex‚cuter ce script sur le systŠme actuel. Pour plus d'informations sur l'ex‚cution de scripts et la d‚finition de strat‚gies d'ex‚cution, voir la rubrique 
+about_Execution_Policies … l'adresse https://go.microsoft.com/fwlink/?LinkID=135170.
+    + CategoryInfo          : Erreur de s‚curit‚ÿ: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnauthorizedAccess
 
-2025-02-10 13:23:52,220 - INFO - Rapport exporté vers un fichier CSV.
-2025-02-10 13:25:13,594 - INFO - Utilisateur trouvé : {'NOM': 'NGUYEN', 'PRENOM': 'William', 'IDENTIFIANT': 'william.nguyen', 'PASSWORD': 'ProtecKcSpgrm$', 'service': 'informatique', 'MESSAGERIE': 'w.nguyen@protec-groupe.com', 'ExpirationDate': '02/07/2030', 'ChangePassword': 'NON', 'Script': 'informatique.bat'}
+2025-02-11 16:30:22,425 - ERROR - Erreur lors de la synchronisation : Impossible de charger le fichier C:\powershell\synchroniser_ad.ps1. Une chaŒne de certificats a ‚t‚ trait‚e mais s'est termin‚e par un certificat racine qui n'est pas 
+approuv‚ par le fournisseur d'approbation.
+    + CategoryInfo          : Erreur de s‚curit‚ÿ: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+2025-02-11 16:30:35,556 - ERROR - Erreur lors de la gestion des groupes AD : L'argument ®ÿC:\powershell\gerer_groupes_ad.ps1ÿ¯ du paramŠtre -File n'existe pas. Indiquez le chemin d'accŠs vers un fichier ®ÿ.ps1ÿ¯ existant pour l'argument du paramŠtre -File.
+
+2025-02-11 16:31:29,997 - ERROR - Erreur lors de la synchronisation : Impossible de charger le fichier C:\powershell\synchroniser_ad.ps1. Une chaŒne de certificats a ‚t‚ trait‚e mais s'est 
+termin‚e par un certificat racine qui n'est pas approuv‚ par le fournisseur d'approbation.
+    + CategoryInfo          : Erreur de s‚curit‚ÿ: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+2025-02-11 16:50:11,768 - ERROR - Erreur lors de la synchronisation : Impossible de charger le fichier C:\powershell\synchroniser_ad.ps1. Une chaŒne de certificats a ‚t‚ trait‚e mais s'est 
+termin‚e par un certificat racine qui n'est pas approuv‚ par le fournisseur d'approbation.
+    + CategoryInfo          : Erreur de s‚curit‚ÿ: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+2025-02-11 16:52:42,938 - ERROR - Erreur lors de la synchronisation : Impossible de charger le fichier C:\powershell\synchroniser_ad.ps1. Une chaŒne de certificats a ‚t‚ trait‚e mais s'est 
+termin‚e par un certificat racine qui n'est pas approuv‚ par le fournisseur d'approbation.
+    + CategoryInfo          : Erreur de s‚curit‚ÿ: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+2025-02-11 16:59:29,268 - ERROR - Erreur lors de la synchronisation : Impossible de charger le fichier C:\powershell\synchroniser_ad.ps1. Une chaŒne de certificats a ‚t‚ trait‚e mais s'est 
+termin‚e par un certificat racine qui n'est pas approuv‚ par le fournisseur d'approbation.
+    + CategoryInfo          : Erreur de s‚curit‚ÿ: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+2025-02-12 10:15:47,392 - INFO - Synchronisation avec AD réussie.
+2025-02-12 10:22:25,035 - INFO - Synchronisation avec AD réussie.
