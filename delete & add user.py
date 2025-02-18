@@ -132,17 +132,11 @@ def modifier_mot_de_passe_user(nom, prenom):
         logging.error(f"Erreur lors de la modification du mot de passe : {str(e)}")
 
 def synchroniser_ad():
-    """Synchronise les utilisateurs avec Active Directory."""
+    """Synchronise les utilisateurs avec Active Directory en ouvrant un terminal PowerShell qui reste ouvert."""
     try:
-        # Exécuter le script PowerShell de synchronisation
-        result = subprocess.run(["powershell", "-File", "C:\\powershell\\synchroniser_ad.ps1"], capture_output=True, text=True)
-       
-        if result.returncode == 0:
-            messagebox.showinfo("Succès", "Synchronisation avec AD réussie !")
-            logging.info("Synchronisation avec AD réussie.")
-        else:
-            messagebox.showerror("Erreur", f"Erreur lors de la synchronisation : {result.stderr}")
-            logging.error(f"Erreur lors de la synchronisation : {result.stderr}")
+        subprocess.Popen(["cmd.exe", "/c", "start", "powershell", "-NoExit", "-File", "C:\\powershell\\synchroniser_ad.ps1"], shell=True)
+        messagebox.showinfo("Succès", "Synchronisation avec AD lancée dans un terminal PowerShell.")
+        logging.info("Synchronisation avec AD lancée dans un terminal PowerShell.")
     except Exception as e:
         messagebox.showerror("Erreur", f"Exception lors de la synchronisation : {str(e)}")
         logging.error(f"Exception lors de la synchronisation : {str(e)}")
@@ -204,37 +198,12 @@ def rechercher_utilisateur(nom, prenom):
         messagebox.showerror("Erreur", f"Erreur lors de la recherche : {str(e)}")
         logging.error(f"Erreur lors de la recherche : {str(e)}")
 
-def gerer_groupes_ad():
-    """Gère les groupes Active Directory."""
-    try:
-        # Exécuter le script PowerShell pour gérer les groupes AD
-        result = subprocess.run(["powershell", "-File", "C:\\powershell\\gerer_groupes_ad.ps1"], capture_output=True, text=True)
-       
-        if result.returncode == 0:
-            messagebox.showinfo("Succès", "Gestion des groupes AD réussie !")
-            logging.info("Gestion des groupes AD réussie.")
-        else:
-            messagebox.showerror("Erreur", f"Erreur lors de la gestion des groupes AD : {result.stderr}")
-            logging.error(f"Erreur lors de la gestion des groupes AD : {result.stderr}")
-    except Exception as e:
-        messagebox.showerror("Erreur", f"Exception lors de la gestion des groupes AD : {str(e)}")
-        logging.error(f"Exception lors de la gestion des groupes AD : {str(e)}")
+import subprocess
+from tkinter import messagebox
+import logging
 
-def gerer_permissions_ntfs():
-    """Gère les permissions NTFS."""
-    try:
-        # Exécuter le script PowerShell pour gérer les permissions NTFS
-        result = subprocess.run(["powershell", "-File", "C:\\powershell\\gerer_permissions_ntfs.ps1"], capture_output=True, text=True)
-       
-        if result.returncode == 0:
-            messagebox.showinfo("Succès", "Gestion des permissions NTFS réussie !")
-            logging.info("Gestion des permissions NTFS réussie.")
-        else:
-            messagebox.showerror("Erreur", f"Erreur lors de la gestion des permissions NTFS : {result.stderr}")
-            logging.error(f"Erreur lors de la gestion des permissions NTFS : {result.stderr}")
-    except Exception as e:
-        messagebox.showerror("Erreur", f"Exception lors de la gestion des permissions NTFS : {str(e)}")
-        logging.error(f"Exception lors de la gestion des permissions NTFS : {str(e)}")
+
+
 
 def exporter_rapport():
     """Exporte un rapport des utilisateurs."""
@@ -282,21 +251,6 @@ neon_green = "#acccc8"  # Vert olive doux
 neon_pink  = "#e2888c"  # Terre cuite subtile  
 neon_blue  = "#acccc8"  # Bleu-gris océanique  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Personnalisation des styles pour une apparence extravagante
 style.configure("TFrame", background=neon_bg)
 style.configure("TLabel", background=neon_bg, foreground=neon_green, font=("Helvetica", 12, "bold"))
@@ -322,17 +276,19 @@ notebook.pack(expand=True, fill="both")
 tab_ajouter_supprimer = ttk.Frame(notebook, padding=10)
 notebook.add(tab_ajouter_supprimer, text="Ajouter/Supprimer")
 
-# Nom
-label_nom = ttk.Label(tab_ajouter_supprimer, text="Nom :")
-label_nom.grid(row=0, column=0, sticky="e", pady=10, padx=10)
-entry_nom = ttk.Entry(tab_ajouter_supprimer, width=30)
-entry_nom.grid(row=0, column=1, sticky="w", pady=10, padx=10)
 
 # Prénom
 label_prenom = ttk.Label(tab_ajouter_supprimer, text="Prénom :")
 label_prenom.grid(row=1, column=0, sticky="e", pady=10, padx=10)
 entry_prenom = ttk.Entry(tab_ajouter_supprimer, width=30)
 entry_prenom.grid(row=1, column=1, sticky="w", pady=10, padx=10)
+
+# Nom
+label_nom = ttk.Label(tab_ajouter_supprimer, text="Nom :")
+label_nom.grid(row=0, column=0, sticky="e", pady=10, padx=10)
+entry_nom = ttk.Entry(tab_ajouter_supprimer, width=30)
+entry_nom.grid(row=0, column=1, sticky="w", pady=10, padx=10)
+
 
 # Service
 label_service = ttk.Label(tab_ajouter_supprimer, text="Service :")
@@ -382,6 +338,8 @@ btn_modifier_mdp_user.grid(row=2, column=0, columnspan=2, pady=20)
 btn_modifier_mdp_all = ttk.Button(tab_modifier_mdp, text="Modifier Tous les Mots de Passe", command=modifier_mots_de_passe)
 btn_modifier_mdp_all.grid(row=3, column=0, columnspan=2, pady=20)
 
+
+
 # -------------------------- Onglet: Synchroniser avec AD --------------------------
 tab_synchroniser = ttk.Frame(notebook, padding=10)
 notebook.add(tab_synchroniser, text="Synchroniser avec AD")
@@ -403,33 +361,21 @@ btn_exporter.pack(pady=10)
 tab_rechercher = ttk.Frame(notebook, padding=10)
 notebook.add(tab_rechercher, text="Rechercher Utilisateur")
 
-label_nom_recherche = ttk.Label(tab_rechercher, text="Nom :")
-label_nom_recherche.grid(row=0, column=0, sticky="e", pady=10, padx=10)
-entry_nom_recherche = ttk.Entry(tab_rechercher, width=30)
-entry_nom_recherche.grid(row=0, column=1, sticky="w", pady=10, padx=10)
-
 label_prenom_recherche = ttk.Label(tab_rechercher, text="Prénom :")
 label_prenom_recherche.grid(row=1, column=0, sticky="e", pady=10, padx=10)
 entry_prenom_recherche = ttk.Entry(tab_rechercher, width=30)
 entry_prenom_recherche.grid(row=1, column=1, sticky="w", pady=10, padx=10)
 
+label_nom_recherche = ttk.Label(tab_rechercher, text="Nom :")
+label_nom_recherche.grid(row=0, column=0, sticky="e", pady=10, padx=10)
+entry_nom_recherche = ttk.Entry(tab_rechercher, width=30)
+entry_nom_recherche.grid(row=0, column=1, sticky="w", pady=10, padx=10)
+
 btn_rechercher = ttk.Button(tab_rechercher, text="Rechercher",
                             command=lambda: rechercher_utilisateur(entry_nom_recherche.get(), entry_prenom_recherche.get()))
 btn_rechercher.grid(row=2, column=0, columnspan=2, pady=20)
 
-# -------------------------- Onglet: Gérer Groupes AD --------------------------
-tab_groupes_ad = ttk.Frame(notebook, padding=10)
-notebook.add(tab_groupes_ad, text="Gérer Groupes AD")
 
-btn_gerer_groupes_ad = ttk.Button(tab_groupes_ad, text="Gérer Groupes AD", command=gerer_groupes_ad)
-btn_gerer_groupes_ad.pack(pady=20)
-
-# -------------------------- Onglet: Gérer Permissions NTFS --------------------------
-tab_permissions_ntfs = ttk.Frame(notebook, padding=10)
-notebook.add(tab_permissions_ntfs, text="Gérer Permissions NTFS")
-
-btn_gerer_permissions_ntfs = ttk.Button(tab_permissions_ntfs, text="Gérer Permissions NTFS", command=gerer_permissions_ntfs)
-btn_gerer_permissions_ntfs.pack(pady=20)
 
 # -------------------------- Onglet: Exporter Rapports --------------------------
 tab_rapports = ttk.Frame(notebook, padding=10)
