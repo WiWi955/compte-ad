@@ -5,14 +5,14 @@ Import-Module ActiveDirectory
 Import-Module NTFSSecurity
 Clear
 
-# Variables globales
-$pathusers_protec = "c:\protec"
-$pathusers_services = "c:\protec\services"
-$pathusers_employe = "c:\protec\employe"
-$DN_services = "OU=service,DC=protec-groupe,DC=com"
-$Domaine = "@protec-groupe.com"
-$expirationDate = Get-Date "2085-12-01"
-$csvPath = "C:\powershell\comptes-protec.csv"
+# Chemins et variables globales
+$pathusers_protec    = "C:\protec"
+$pathusers_services  = "C:\protec\services"
+$pathusers_employe   = "C:\protec\employe"
+$DN_services         = "OU=service,DC=protec-groupe,DC=com"
+$Domaine             = "@protec-groupe.com"
+$expirationDate      = Get-Date "2085-12-01"
+$csvPath             = "C:\powershell\comptes-protec.csv"
 
 # Création des répertoires s'ils n'existent pas
 foreach ($path in @($pathusers_protec, $pathusers_services, $pathusers_employe)) {
@@ -30,79 +30,97 @@ if (-not (Test-Path $csvPath)) {
 # Importation des utilisateurs depuis le fichier CSV
 $users = Import-Csv -Path $csvPath -Delimiter ";"
 
-# Récupération des utilisateurs existants
+# Récupération des utilisateurs existants (optionnel, ici uniquement pour vérification)
 $existingUsers = Get-ADUser -Filter * -SearchBase $DN_services | Select-Object -ExpandProperty SamAccountName
 
-# Création des utilisateurs
+# Boucle de création des utilisateurs
 foreach ($user in $users) {
-    $nom = $user.NOM
-    $prenom = $user.PRENOM
-    $id = $user.IDENTIFIANT
-    $displayname = "$prenom $nom"
-    $login = "$id$Domaine"
-    $script = $user.Script
-    $groupes = $user.GROUPES_AD -split ","
-    $dossier = $user.DOSSIER_NTFS
-    $droits = $user.DROITS_NTFS
-    $dn_classe = "OU=$($user.SERVICE),OU=service,DC=protec-groupe,DC=com"
 
-    # Vérification et création de l'OU service si nécessaire
-    if (-not (Get-ADOrganizationalUnit -Filter {Name -eq $user.SERVICE})) {
-        New-ADOrganizationalUnit -Name $user.SERVICE -Path "OU=service,DC=protec-groupe,DC=com"
+    # Vérification et assignation de valeurs par défaut pour chaque champ
+    $nom       = if ([string]::IsNullOrEmpty($user.NOM))         { "NomNonDefini" }       else { $user.NOM }
+    $prenom    = if ([string]::IsNullOrEmpty($user.PRENOM))      { "PrenomNonDefini" }    else { $user.PRENOM }
+    $id        = if ([string]::IsNullOrEmpty($user.IDENTIFIANT)) { "user_" + (Get-Random) } else { $user.IDENTIFIANT }
+    $password  = if ([string]::IsNullOrEmpty($user.PASSWORD))    { "MotDePasseParDefaut123!" } else { $user.PASSWORD }
+    $service   = if ([string]::IsNullOrEmpty($user.Service))       { "ServiceCommun" }      else { $user.Service }
+    $messagerie= $user.MESSAGERIE  # Peut rester vide si non indispensable
+    $script    = if ([string]::IsNullOrEmpty($user.Script))      { $null }                else { $user.Script }
+    
+    $displayname = "$prenom $nom"
+    $login       = "$id$Domaine"
+    $dn_classe   = "OU=$service,OU=service,DC=protec-groupe,DC=com"
+
+    # Vérification et création de l'OU correspondant au service si nécessaire
+    if (-not (Get-ADOrganizationalUnit -Filter {Name -eq $service} -ErrorAction SilentlyContinue)) {
+        try {
+            New-ADOrganizationalUnit -Name $service -Path "OU=service,DC=protec-groupe,DC=com" -ErrorAction Stop
+            Write-Host "OU '$service' créée." -ForegroundColor Green
+        } catch {
+            Write-Host "Erreur lors de la création de l'OU '$service' : $_" -ForegroundColor Red
+        }
     }
 
     # Vérification et création du groupe global de service
-    $groupe_g = "$($user.SERVICE)_g"
-    if (-not (Get-ADGroup -Filter {Name -eq $groupe_g})) {
-        New-ADGroup -Name $groupe_g -GroupScope Global -Path "OU=service,DC=protec-groupe,DC=com"
+    $groupe_g = "$service" + "_g"
+    if (-not (Get-ADGroup -Filter {Name -eq $groupe_g} -ErrorAction SilentlyContinue)) {
+        try {
+            New-ADGroup -Name $groupe_g -GroupScope Global -Path "OU=service,DC=protec-groupe,DC=com" -ErrorAction Stop
+            Write-Host "Groupe '$groupe_g' créé." -ForegroundColor Green
+        } catch {
+            Write-Host "Erreur lors de la création du groupe '$groupe_g' : $_" -ForegroundColor Red
+        }
     }
 
-    # Création de l'utilisateur si inexistant
-    if (-not (Get-ADUser -Filter {SamAccountName -eq $id})) {
+    # Création de l'utilisateur s'il n'existe pas déjà
+    if (-not (Get-ADUser -Filter {SamAccountName -eq $id} -ErrorAction SilentlyContinue)) {
         try {
             New-ADUser -Name $displayname `
-                        -GivenName $prenom `
-                        -Surname $nom `
-                        -SamAccountName $id `
-                        -UserPrincipalName $login `
-                        -Path $dn_classe `
-                        -AccountPassword (ConvertTo-SecureString $user.PASSWORD -AsPlainText -Force) `
-                        -DisplayName $displayname `
-                        -EmailAddress $user.MESSAGERIE `
-                        -Enabled $true `
-                        -PasswordNeverExpires $true `
-                        -ScriptPath $script
-            
+                       -GivenName $prenom `
+                       -Surname $nom `
+                       -SamAccountName $id `
+                       -UserPrincipalName $login `
+                       -Path $dn_classe `
+                       -AccountPassword (ConvertTo-SecureString $password -AsPlainText -Force) `
+                       -DisplayName $displayname `
+                       -EmailAddress $messagerie `
+                       -Enabled $true `
+                       -PasswordNeverExpires $true `
+                       -ScriptPath $script `
+                       -ErrorAction Stop
             Start-Sleep -Seconds 2
 
-            # Ajout au groupe de service
-            Add-ADGroupMember -Identity $groupe_g -Members $id
-
-            # Définition de l'expiration et du mot de passe
-            Set-ADUser -Identity $id -AccountExpirationDate $expirationDate
-            Set-ADUser -Identity $id -CannotChangePassword $true
-
-            # Création des dossiers personnels
-            $userPath = Join-Path -Path "$pathusers_employe\$($user.SERVICE)" -ChildPath $id
-            if (-not (Test-Path $userPath)) { New-Item -ItemType Directory -Path $userPath }
-
-            # Application des permissions NTFS
-            if ($dossier -and (Test-Path $dossier)) {
-                $regle = New-Object System.Security.AccessControl.FileSystemAccessRule($id, $droits, "ContainerInherit,ObjectInherit", "None", "Allow")
-                $acl = Get-Acl -Path $dossier
-                $acl.SetAccessRule($regle)
-                Set-Acl -Path $dossier -AclObject $acl
-                Write-Host "Permissions $droits appliquées sur $dossier pour $id" -ForegroundColor Green
+            # Ajout de l'utilisateur au groupe global de service
+            try {
+                Add-ADGroupMember -Identity $groupe_g -Members $id -ErrorAction Stop
+                Write-Host "Utilisateur ajouté au groupe '$groupe_g'." -ForegroundColor Green
+            } catch {
+                Write-Host "Erreur lors de l'ajout de $id au groupe '$groupe_g' : $_" -ForegroundColor Yellow
             }
 
-            Write-Host "Utilisateur $displayname créé avec succès !" -ForegroundColor Green
+            # Définition de la date d'expiration et configuration du mot de passe
+            try {
+                Set-ADUser -Identity $id -AccountExpirationDate $expirationDate -ErrorAction Stop
+                Set-ADUser -Identity $id -CannotChangePassword $true -ErrorAction Stop
+            } catch {
+                Write-Host "Erreur de configuration pour $id : $_" -ForegroundColor Yellow
+            }
+
+            # Création du dossier personnel
+            $userPath = Join-Path -Path "$pathusers_employe\$service" -ChildPath $id
+            if (-not (Test-Path $userPath)) {
+                New-Item -ItemType Directory -Path $userPath | Out-Null
+                Write-Host "Dossier personnel créé pour $id." -ForegroundColor Green
+            }
+
+            Write-Host "Utilisateur '$displayname' créé avec succès !" -ForegroundColor Green
         } catch {
-            Write-Host "Erreur création de $displayname : $_" -ForegroundColor Red
+            Write-Host "Erreur lors de la création de l'utilisateur '$displayname' : $_" -ForegroundColor Red
         }
-    } else {
-        Write-Host "L'utilisateur $displayname existe déjà." -ForegroundColor Yellow
+    }
+    else {
+        Write-Host "L'utilisateur '$displayname' existe déjà." -ForegroundColor Yellow
     }
 }
+
 
 # Suppression des utilisateurs obsolètes
 foreach ($existingUser in $existingUsers) {
